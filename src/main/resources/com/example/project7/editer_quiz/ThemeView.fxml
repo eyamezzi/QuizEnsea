@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.JFXButton?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.project7.controller.edition.ThemeView"
+            style="-fx-background-color: #F5F5F5;"
+            prefHeight="700.0"
+            prefWidth="1000.0">
+
+    <VBox spacing="20" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+
+        <!-- EN-TETE AVEC STATISTIQUES -->
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+            <!-- Statistique Exercices -->
+            <VBox alignment="CENTER" spacing="5"
+                  style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
+                  HBox.hgrow="ALWAYS" maxWidth="200">
+                <HBox spacing="8" alignment="CENTER">
+                    <Label text="📝" style="-fx-font-size: 24px;" />
+                    <Label fx:id="lblNbExercices" text="24"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #5E35B1;" />
+                </HBox>
+                <Label text="Exercices" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+            </VBox>
+
+            <!-- Statistique Themes -->
+            <VBox alignment="CENTER" spacing="5"
+                  style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
+                  HBox.hgrow="ALWAYS" maxWidth="200">
+                <HBox spacing="8" alignment="CENTER">
+                    <Label text="🏷️" style="-fx-font-size: 24px;" />
+                    <Label fx:id="lblNbThemes" text="8"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #F57C00;" />
+                </HBox>
+                <Label text="Thèmes" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+            </VBox>
+
+            <!-- Statistique Questions -->
+            <VBox alignment="CENTER" spacing="5"
+                  style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
+                  HBox.hgrow="ALWAYS" maxWidth="200">
+                <HBox spacing="8" alignment="CENTER">
+                    <Label text="❓" style="-fx-font-size: 24px;" />
+                    <Label fx:id="lblNbQuestions" text="156"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #E91E63;" />
+                </HBox>
+                <Label text="Questions" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+            <JFXButton fx:id="btnGererThemes" text="⚙️ Gérer"
+                       onAction="#handleGererThemes"
+                       style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 15;"
+                       prefWidth="100" prefHeight="40" />
+        </HBox>
+
+        <!-- BARRE DE RECHERCHE -->
+        <HBox spacing="10" alignment="CENTER_LEFT"
+              prefWidth="450" maxWidth="450"
+              style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 10;">
+            <Label text="🔍" style="-fx-font-size: 18px;" />
+            <TextField fx:id="txtRecherche"
+                       promptText="Rechercher un exercice..."
+                       prefWidth="280" maxWidth="280"
+                       style="-fx-font-size: 14px; -fx-border-color: transparent; -fx-background-color: transparent;" />
+            <JFXButton text="Rechercher"
+                       onAction="#handleRechercher"
+                       style="-fx-background-color: #5E35B1; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 5 10;" />
+        </HBox>
+        <!-- FILTRES -->
+        <VBox spacing="10">
+            <Label text="Filtrer par thèmes :"
+                   style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #666;" />
+            <FlowPane fx:id="flowPaneFiltres" hgap="10" vgap="10" />
+        </VBox>
+
+        <!-- LISTE DES EXERCICES AVEC SCROLL -->
+        <ScrollPane fx:id="scrollPaneExercices"
+                    fitToWidth="true"
+                    fitToHeight="false"
+                    VBox.vgrow="ALWAYS"
+                    style="-fx-background-color: transparent; -fx-background: transparent;"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    pannable="true">
+            <content>
+                <FlowPane fx:id="flowPaneExercices"
+                          hgap="18" vgap="18"
+                          alignment="TOP_LEFT"
+                          style="-fx-padding: 10;"
+                          prefHeight="110">
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </VBox>
+</AnchorPane>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="680.0" prefWidth="794.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project7.controller.edition.EditerQCU">
+   <children>
+      <ScrollPane fitToWidth="true" prefHeight="680.0" prefWidth="794.0" style="-fx-background-color: transparent;">
+         <content>
+            <VBox prefWidth="780.0" spacing="0">
+               <padding>
+                  <Insets bottom="50.0" />
+               </padding>
+               <children>
+                  <!-- ========== SECTION EXERCICE ========== -->
+                  <VBox spacing="8" style="-fx-padding: 15; -fx-border-color: #CCCCCC; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: #F5F5F5;">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                           <children>
+                              <Label text="Exercise :" prefWidth="70" style="-fx-font-size: 12px;" />
+
+                              <ComboBox fx:id="comboExercice" prefWidth="350" promptText="Sélectionner un exercice..." HBox.hgrow="ALWAYS" />
+
+                              <JFXButton fx:id="btnNouvelExercice" onAction="#handleNouvelExercice" prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #A53860;" text="+ Nouvel Exercice" textFill="WHITE" />
+
+                              <JFXButton fx:id="btnModifierExercice" onAction="#handleModifierExercice" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #FF9800;" text="Modifier" textFill="WHITE" visible="false" />
+                           </children>
+                        </HBox>
+
+                        <Label text="ℹ️ Les questions sont regroupées par exercice dans le sujet final." style="-fx-font-size: 11px; -fx-text-fill: #666666; -fx-font-style: italic;" wrapText="true" />
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </VBox>
+
+                  <!-- Espacement -->
+                  <Region prefHeight="10.0" />
+
+                  <!-- ========== SECTION QUESTION ========== -->
+                  <HBox prefHeight="100.0" prefWidth="794.0">
+                     <children>
+                        <Pane prefHeight="100.0" prefWidth="796.0">
+                           <children>
+                              <Label layoutX="38.0" layoutY="37.0" prefHeight="27.0" prefWidth="119.0" text="The question :" />
+                              <TextArea fx:id="enonceQuestion" layoutX="224.0" layoutY="31.0" prefHeight="39.0" prefWidth="446.0" promptText="Please enter the statement of the question !" />
+                              <Button layoutX="684.0" layoutY="31.0" mnemonicParsing="false" onAction="#modfiyQuestion" prefHeight="39.0" prefWidth="48.0" text="..." />
+                           </children>
+                        </Pane>
+                     </children>
+                  </HBox>
+
+                  <!-- ========== RÉPONSE CORRECTE ========== -->
+                  <HBox alignment="CENTER" prefHeight="140.0" prefWidth="794.0" spacing="10.0">
+                     <children>
+                        <Pane prefHeight="0.0" prefWidth="744.0">
+                           <children>
+                              <TextArea fx:id="reponseCorrect" layoutX="293.0" layoutY="41.0" prefHeight="39.0" prefWidth="350.0" promptText="Please enter the correct answer!" />
+                              <Button layoutX="661.0" layoutY="41.0" mnemonicParsing="false" onAction="#modifyCorrectAnswer" prefHeight="39.0" prefWidth="48.0" text="..." />
+                              <TextField fx:id="baremePos" layoutX="199.0" layoutY="41.0" onKeyTyped="#handleInputNumber" prefHeight="39.0" prefWidth="76.0" promptText="1,2,3,...." />
+                              <Label layoutX="14.0" layoutY="27.0" prefHeight="67.0" prefWidth="185.0" text="Grading scale for the &#10;correct answers :" />
+                           </children>
+                        </Pane>
+                     </children>
+                  </HBox>
+
+                  <!-- ========== RÉPONSES INCORRECTES ========== -->
+                  <HBox alignment="CENTER" prefHeight="140.0" prefWidth="794.0" spacing="10.0">
+                     <children>
+                        <Pane prefHeight="14.0" prefWidth="744.0">
+                           <children>
+                              <TextField fx:id="baremeNegDefault" layoutX="199.0" layoutY="8.0" onKeyTyped="#handleInputNumber" prefHeight="39.0" prefWidth="76.0" promptText="0,-1,...." />
+                              <Label layoutX="14.0" layoutY="7.0" prefHeight="67.0" prefWidth="179.0" text="Grading scale for the &#10;incorrect answers :" />
+                              <Button fx:id="ajouterMauvaiseReponse" layoutX="305.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleClicksAddWrongResponce" prefHeight="31.0" prefWidth="339.0" text="Add an Incorrect answer and its Grade" textAlignment="CENTER" />
+                           </children>
+                        </Pane>
+                     </children>
+                  </HBox>
+
+                  <!-- ========== TABLEAU DES RÉPONSES INCORRECTES ========== -->
+                  <HBox prefHeight="302.0" prefWidth="774.0" spacing="10.0">
+                     <children>
+                        <TableView fx:id="incorrectTableView" editable="true" prefHeight="266.0" prefWidth="745.0">
+                           <columns>
+                              <TableColumn fx:id="responseColumn" prefWidth="542.9999860525131" text="Answer" />
+                              <TableColumn fx:id="scoreColumn" minWidth="0.0" prefWidth="46.3333740234375" text="Grade" />
+                              <TableColumn fx:id="actionColumn" prefWidth="150.0" text="Action" />
+                           </columns>
+                           <HBox.margin>
+                              <Insets left="25.0" right="10.0" />
+                           </HBox.margin>
+                        </TableView>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </HBox>
+
+                  <!-- ========== BOUTONS DE VALIDATION ========== -->
+                  <HBox alignment="CENTER" prefHeight="89.0" prefWidth="794.0" spacing="50.0">
+                     <children>
+                        <JFXButton fx:id="ajouterQcu" onAction="#handleClicksAddQCU" prefHeight="39.0" prefWidth="97.0" style="-fx-background-color: #A53860;" text="Add" textFill="WHITE" />
+                        <JFXButton fx:id="cancelQcu" onAction="#handleClicksCancelQCU" prefHeight="39.0" prefWidth="91.0" style="-fx-background-color: #fff0f3;" text="Cancel" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</AnchorPane>
