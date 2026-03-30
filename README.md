@@ -32,10 +32,7 @@ To get a local copy up and running, follow these simple steps:
 
 ### Get the application
 - Clone the Repository
-```bash
-git clone https://github.com/HadjSassi/QuizEnsea.git
-cd QuizEnsea
-```
+
 
 
 ## Usage
