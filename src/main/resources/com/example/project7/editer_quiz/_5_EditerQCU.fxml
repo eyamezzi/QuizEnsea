@@ -23,13 +23,13 @@
 
                               <ComboBox fx:id="comboExercice" prefWidth="350" promptText="Sélectionner un exercice..." HBox.hgrow="ALWAYS" />
 
-                              <JFXButton fx:id="btnNouvelExercice" onAction="#handleNouvelExercice" prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #A53860;" text="+ Nouvel Exercice" textFill="WHITE" />
+                              <JFXButton fx:id="btnNouvelExercice" onAction="#handleNouvelExercice" prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #A53860;" text="+ New Exercise" textFill="WHITE" />
 
-                              <JFXButton fx:id="btnModifierExercice" onAction="#handleModifierExercice" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #FF9800;" text="Modifier" textFill="WHITE" visible="false" />
+                              <JFXButton fx:id="btnModifierExercice" onAction="#handleModifierExercice" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #FF9800;" text="Edit" textFill="WHITE" visible="false" />
                            </children>
                         </HBox>
 
-                        <Label text="ℹ️ Les questions sont regroupées par exercice dans le sujet final." style="-fx-font-size: 11px; -fx-text-fill: #666666; -fx-font-style: italic;" wrapText="true" />
+                        <Label text="ℹ️ Questions are grouped by exercise in the final exam." style="-fx-font-size: 11px; -fx-text-fill: #666666; -fx-font-style: italic;" wrapText="true" />
                      </children>
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" top="10.0" />

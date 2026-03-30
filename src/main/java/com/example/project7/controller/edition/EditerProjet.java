@@ -1,11 +1,13 @@
 package com.example.project7.controller.edition;
 
 import com.example.project7.FxmlLoader;
+import com.example.project7.controller.correction.UploadCopiesController;
 import com.example.project7.model.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -39,9 +41,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.ArrayList;
 
-
 public class EditerProjet implements Initializable {
-
     private static Section dernierSection;
 
     private Projet projet;
@@ -122,15 +122,12 @@ public class EditerProjet implements Initializable {
                     popupStage.close();
                 });
             }
-
             popupStage.showAndWait();
-
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Unable to open theme editor: " + e.getMessage());
         }
     }
-
     public void associerThemeParDefautAExercice(int exerciceID) {
         Object themeParDefaut = comboThemeParDefaut.getValue();
 
@@ -222,7 +219,10 @@ public class EditerProjet implements Initializable {
             // Gérer la sélection avec mise à jour en temps réel
             comboThemeParDefaut.setOnAction(event -> {
                 Object selected = comboThemeParDefaut.getValue();
-
+                if (selected == null) {
+                    System.out.println("⚠️ Aucun thème sélectionné");
+                    return;
+                }
                 if (selected instanceof String && selected.equals("+ Ajouter un thème par défaut")) {
                     // Restaurer l'ancien thème temporairement
                     Object ancienTheme = getThemeActuelDansCombo();
@@ -252,9 +252,20 @@ public class EditerProjet implements Initializable {
      */
     private Object getThemeActuelDansCombo() {
         Object current = comboThemeParDefaut.getValue();
+
+        // ✅ PROTECTION : Retourner null si pas de thème ou si c'est le texte d'ajout
+        if (current == null) {
+            return null;
+        }
+
+        if (current instanceof String && current.equals("+ Ajouter un thème par défaut")) {
+            return null;
+        }
+
         if (current instanceof Theme) {
             return current;
         }
+
         return null;
     }
 
@@ -262,6 +273,11 @@ public class EditerProjet implements Initializable {
      * Met à jour le thème par défaut en temps réel dès la sélection
      */
     private void mettreAJourThemeEnTempsReel(Theme nouveauTheme) {
+        if (nouveauTheme == null) {
+            System.out.println("⚠️ Thème null, annulation");
+            return;
+        }
+
         if (devoir == null || devoir.getIdControle() == 0) {
             System.out.println("⚠️ Épreuve non encore créée, pas de mise à jour");
             return;
@@ -759,18 +775,23 @@ public class EditerProjet implements Initializable {
                     // ⭐ CHARGER LE THÈME PAR DÉFAUT ⭐
                     int themeParDefautID = resultSet.getInt("themeParDefautID");
                     if (!resultSet.wasNull() && themeParDefautID > 0) {
-                        // Chercher le thème dans la liste
-                        for (Object obj : themesDisponibles) {
-                            if (obj instanceof Theme) {
-                                Theme theme = (Theme) obj;
-                                if (theme.getIdTheme() == themeParDefautID) {
-                                    comboThemeParDefaut.setValue(theme);
-                                    dernierThemeID = themeParDefautID; // ⭐ INITIALISER ⭐
-                                    System.out.println("✅ Thème par défaut rechargé : " + theme.getNomTheme());
-                                    break;
+                        if (themesDisponibles != null && !themesDisponibles.isEmpty()) {
+                            // Chercher le thème dans la liste
+                            for (Object obj : themesDisponibles) {
+                                if (obj instanceof Theme) {
+                                    Theme theme = (Theme) obj;
+                                    if (theme.getIdTheme() == themeParDefautID) {
+                                        comboThemeParDefaut.setValue(theme);
+                                        dernierThemeID = themeParDefautID; // ⭐ INITIALISER ⭐
+                                        System.out.println("✅ Thème par défaut rechargé : " + theme.getNomTheme());
+                                        break;
+                                    }
                                 }
-                            }
+                            }   }
+                        else {
+                            System.out.println("⚠️ Liste des thèmes vide, impossible de charger le thème par défaut");
                         }
+
                     }
 
                 } else {
@@ -893,15 +914,7 @@ public class EditerProjet implements Initializable {
     }
 
     private void handleMoveUp(int index) {
-        RowTableSection section = tableSection.getItems().get(index);
-        if (section.getOrdre() > 1) {
-            RowTableSection sectionToMoveWith = tableSection.getItems().get(index - 1);
-            section.setOrdre(section.getOrdre() - 1);
-            sectionToMoveWith.setOrdre(section.getOrdre() + 1);
-            updateRowTableSection(section);
-            updateRowTableSection(sectionToMoveWith);
-            fetchAndUpdateTableView();
-        }
+        deplacerExerciceComplet(index, true);
     }
 
     private void updateRowTableSection(RowTableSection section) {
@@ -989,19 +1002,8 @@ public class EditerProjet implements Initializable {
     }
 
     private void handleMoveDown(int index) {
-        RowTableSection section = tableSection.getItems().get(index);
-        try {
-            RowTableSection sectionToMoveWith = tableSection.getItems().get(index + 1);
-            section.setOrdre(section.getOrdre() + 1);
-            sectionToMoveWith.setOrdre(section.getOrdre() - 1);
-            updateRowTableSection(section);
-            updateRowTableSection(sectionToMoveWith);
-            fetchAndUpdateTableView();
-        } catch (IndexOutOfBoundsException e) {
-            // Fin de liste
-        }
+        deplacerExerciceComplet(index, false);
     }
-
     private void loadSectionData() {
         if (this.devoir != null) {
             String query = "SELECT Section.idSection, QCM.isQCU, QCM.question AS question, " +
@@ -1318,7 +1320,6 @@ public class EditerProjet implements Initializable {
             e.printStackTrace();
         }
     }
-
     private void processFreeQuestion(Connection conn, String idSection, String question, String idSectionLatex, StringBuilder texcontentBuilder) throws SQLException {
         PreparedStatement psFreeQuestion = conn.prepareStatement("SELECT nombreLigne, tailleLigne, rappel, scoreTotal, nombreScore FROM QuestionLibre WHERE sectionID = ?");
         psFreeQuestion.setString(1, idSection);
@@ -1330,26 +1331,47 @@ public class EditerProjet implements Initializable {
             int scoreTotal = rsFreeQuestion.getInt("scoreTotal");
             int nombreScore = rsFreeQuestion.getInt("nombreScore");
 
-            texcontentBuilder.append("\n\t\\element{general}{\n");
-            texcontentBuilder.append("\t\\begin{question}{").append(removeLatexSpecialCharacters(idSectionLatex)).append("}\n");
-            texcontentBuilder.append("\t\t").append(formatLatex(question)).append("\n");
-            texcontentBuilder.append("\t\t\\AMCOpen{lines=").append(nombreLigne)
+            // Début de la question
+            texcontentBuilder.append("\n\\begin{question}{").append(removeLatexSpecialCharacters(idSectionLatex)).append("}\n");
+            texcontentBuilder.append("\t").append(formatLatex(question)).append("\n");
+
+            // ✅ NOUVEAU : Espace de réponse visible et encadré
+            texcontentBuilder.append("\n\\vspace{0.3cm}\n");
+            texcontentBuilder.append("\\noindent\\textit{}\n\n");
+
+            // Cadre avec lignes
+            texcontentBuilder.append("\\noindent\\fbox{\\begin{minipage}{0.95\\textwidth}\n");
+            texcontentBuilder.append("\\vspace{0.2cm}\n");
+
+            // Générer les lignes pour écrire
+            for (int i = 0; i < nombreLigne; i++) {
+                texcontentBuilder.append("\\rule{0pt}{").append(tailleLigne).append("cm}");
+                texcontentBuilder.append("\\dotfill\\\\\n");
+            }
+
+            texcontentBuilder.append("\\vspace{0.2cm}\n");
+            texcontentBuilder.append("\\end{minipage}}\n\n");
+
+            // AMCOpen pour la correction (zone OCR sur la feuille de réponse)
+            texcontentBuilder.append("\t\\AMCOpen{lines=").append(nombreLigne)
                     .append(",lineheight=").append(tailleLigne)
                     .append("cm,question=\\texttt{").append(rappel).append("}}\n");
-            texcontentBuilder.append("\t\t{\n");
+            texcontentBuilder.append("\t{\n");
 
+            // Barème de notation
             for (int i = 0; i < nombreScore; i++) {
-                texcontentBuilder.append("\t\t\t\\mauvaise[").append(i).append("]{").append(i)
+                texcontentBuilder.append("\t\t\\mauvaise[").append(i).append("]{").append(i)
                         .append("}\\scoring{").append(scoreTotal).append("*").append(i)
                         .append("/").append(nombreScore).append("}\n");
             }
 
-            texcontentBuilder.append("\t\t\t\\bonne[").append(nombreScore).append("]{").append(nombreScore)
+            texcontentBuilder.append("\t\t\\bonne[").append(nombreScore).append("]{").append(nombreScore)
                     .append("}\\scoring{").append(scoreTotal).append("}\n");
-            texcontentBuilder.append("\t\t}\n");
-            texcontentBuilder.append("\t\\end{question}\n");
             texcontentBuilder.append("\t}\n");
+            texcontentBuilder.append("\\end{question}\n");
         }
+        rsFreeQuestion.close();
+        psFreeQuestion.close();
     }
 
     private void processDescription(Connection conn, String idSection, StringBuilder texcontentBuilder) throws SQLException {
@@ -1563,6 +1585,9 @@ public class EditerProjet implements Initializable {
     }
 
     private String formatLatex(String text) {
+        if (text == null) {
+            return "";
+        }
         return text
                 .replace("\\ ", "\\textbackslash{}")
                 .replace("&", "\\&")
@@ -1629,6 +1654,7 @@ public class EditerProjet implements Initializable {
                 String idSection = row.getIdSection();
                 String idSectionLatex = idSection.replace("#", " : ");
 
+                // ✅ Gestion des exercices
                 if (row.getExerciceNumero() != null) {
                     boolean isNewExercice = (currentExerciceNumero == null) ||
                             (!currentExerciceNumero.equals(row.getExerciceNumero()));
@@ -1641,19 +1667,26 @@ public class EditerProjet implements Initializable {
                         currentExerciceNumero = row.getExerciceNumero();
 
                         texcontentBuilder.append("\n\\element{general}{\n");
-                        texcontentBuilder.append("\\noindent{\\LARGE\\textbf{\\textbf{Exercice ")
+                        texcontentBuilder.append("\\noindent{\\LARGE\\textbf{Exercice ")
                                 .append(currentExerciceNumero);
                         if (row.getExerciceTitre() != null && !row.getExerciceTitre().trim().isEmpty()) {
                             texcontentBuilder.append(" : ")
                                     .append(formatLatex(row.getExerciceTitre()));
                         }
-                        texcontentBuilder.append("}}}\n\n");
+                        texcontentBuilder.append("}}\n\n");
                         texcontentBuilder.append("\\vspace{0.5cm}\n\n");
 
                         exerciceOpen = true;
                     }
+                } else {
+                    // ✅ NOUVEAU : Questions sans exercice (hors exercice)
+                    if (exerciceOpen) {
+                        texcontentBuilder.append("}\n\n");
+                        exerciceOpen = false;
+                    }
                 }
 
+                // Génération du contenu de la question
                 if (type.equals("QCM") || type.equals("QCU")) {
                     processQCM(conn, idSection, question, idSectionLatex, texcontentBuilder);
                 } else if (type.equals("QuestionLibre")) {
@@ -1750,5 +1783,130 @@ public class EditerProjet implements Initializable {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    /**
+     * Renuméroter automatiquement les exercices dans l'ordre d'affichage
+     */
+    private void renumeroterExercices() {
+        String query = "SELECT DISTINCT s.exerciceID FROM Section s WHERE s.controleID = ? ORDER BY s.ordreSection";
+
+        try (Connection conn = SqlConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, devoir.getIdControle());
+            ResultSet rs = stmt.executeQuery();
+
+            int nouveauNumero = 1;
+            List<Integer> exerciceIDs = new ArrayList<>();
+
+            while (rs.next()) {
+                int exerciceID = rs.getInt("exerciceID");
+                if (exerciceID > 0 && !exerciceIDs.contains(exerciceID)) {
+                    exerciceIDs.add(exerciceID);
+                }
+            }
+
+            // Mettre à jour les numéros
+            String updateQuery = "UPDATE Exercice SET numero = ? WHERE idExercice = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+
+            for (int exerciceID : exerciceIDs) {
+                updateStmt.setInt(1, nouveauNumero++);
+                updateStmt.setInt(2, exerciceID);
+                updateStmt.executeUpdate();
+            }
+
+            System.out.println("✅ Exercices renumérotés : " + exerciceIDs.size() + " exercices");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * Déplacer un exercice complet (toutes ses sections) vers le haut ou le bas
+     */
+    private void deplacerExerciceComplet(int index, boolean versLeHaut) {
+        RowTableSection sectionCliquee = tableSection.getItems().get(index);
+        Integer exerciceID = sectionCliquee.getExerciceNumero();
+
+        if (exerciceID == null) {
+            // Pas d'exercice, déplacer juste cette ligne
+            if (versLeHaut) {
+                handleMoveUp(index);
+            } else {
+                handleMoveDown(index);
+            }
+            return;
+        }
+
+        // Trouver TOUTES les sections de cet exercice
+        ObservableList<RowTableSection> allSections = tableSection.getItems();
+        List<Integer> indicesExercice = new ArrayList<>();
+
+        for (int i = 0; i < allSections.size(); i++) {
+            RowTableSection row = allSections.get(i);
+            if (exerciceID.equals(row.getExerciceNumero())) {
+                indicesExercice.add(i);
+            }
+        }
+
+        if (indicesExercice.isEmpty()) return;
+
+        int premierIndex = indicesExercice.get(0);
+        int dernierIndex = indicesExercice.get(indicesExercice.size() - 1);
+
+        System.out.println("📦 Déplacement exercice #" + exerciceID +
+                " (lignes " + premierIndex + " à " + dernierIndex + ")");
+
+        if (versLeHaut) {
+            // Vérifier si on peut monter
+            if (premierIndex == 0) {
+                System.out.println("⚠️ Exercice déjà en haut");
+                return;
+            }
+
+            // Déplacer chaque section de l'exercice vers le haut
+            for (int idx : indicesExercice) {
+                RowTableSection section = allSections.get(idx);
+                RowTableSection sectionPrecedente = allSections.get(idx - 1);
+
+                int ordreTemp = section.getOrdre();
+                section.setOrdre(sectionPrecedente.getOrdre());
+                sectionPrecedente.setOrdre(ordreTemp);
+
+                updateRowTableSection(section);
+                updateRowTableSection(sectionPrecedente);
+            }
+
+        } else {
+            // Vérifier si on peut descendre
+            if (dernierIndex >= allSections.size() - 1) {
+                System.out.println("⚠️ Exercice déjà en bas");
+                return;
+            }
+
+            // Déplacer chaque section de l'exercice vers le bas (EN PARTANT DU BAS)
+            for (int i = indicesExercice.size() - 1; i >= 0; i--) {
+                int idx = indicesExercice.get(i);
+                RowTableSection section = allSections.get(idx);
+                RowTableSection sectionSuivante = allSections.get(idx + 1);
+
+                int ordreTemp = section.getOrdre();
+                section.setOrdre(sectionSuivante.getOrdre());
+                sectionSuivante.setOrdre(ordreTemp);
+
+                updateRowTableSection(section);
+                updateRowTableSection(sectionSuivante);
+            }
+        }
+
+        // Renuméroter et recharger
+        renumeroterExercices();
+        fetchAndUpdateTableView();
+
+        System.out.println("✅ Exercice déplacé avec succès");
     }
 }

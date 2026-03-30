@@ -12,14 +12,16 @@
       style="-fx-background-color: white; -fx-padding: 20;">
 
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="📝 Créer/Modifier un Exercice"
+        <Label text="📝 Create / Edit an Exercise
+
+"
                style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B4789;"/>
     </HBox>
 
     <Separator/>
 
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Numéro d'exercice :"
+        <Label text="Exercise number :"
                prefWidth="150"
                style="-fx-font-weight: bold;"/>
         <Spinner fx:id="spinnerNumero"
@@ -28,7 +30,7 @@
     </HBox>
 
     <VBox spacing="5">
-        <Label text="Titre de l'exercice : *"
+        <Label text="Exercise title : *"
                style="-fx-font-weight: bold;"/>
         <TextField fx:id="txtTitre"
                    promptText="Ex: Algorithmes de tri"
@@ -36,16 +38,16 @@
     </VBox>
 
     <VBox spacing="5">
-        <Label text="Consigne (optionnel) :"/>
+        <Label text="Instructions (optional) :"/>
         <TextArea fx:id="txtConsigne"
                   prefRowCount="4"
                   wrapText="true"
-                  promptText="Instructions pour l'exercice..."
+                  promptText="Instructions for the exercise..."
                   style="-fx-border-color: #8B4789; -fx-border-radius: 5;"/>
     </VBox>
 
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Barème (points) :"
+        <Label text="Grading (points) :"
                prefWidth="150"
                style="-fx-font-weight: bold;"/>
         <TextField fx:id="txtBareme"
@@ -60,16 +62,16 @@
 
     <!-- ========== SECTION THÈMES ========== -->
     <VBox spacing="10" style="-fx-padding: 15; -fx-border-color: #CCCCCC; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: #F9F9F9;">
-        <Label text="📚 Thèmes de l'exercice" style="-fx-font-size: 13px; -fx-font-weight: bold;" />
+        <Label text="📚 Exercise Topics " style="-fx-font-size: 13px; -fx-font-weight: bold;" />
 
         <HBox spacing="10" alignment="CENTER_LEFT">
             <children>
-                <Label text="Ajouter un thème :" prefWidth="110" style="-fx-font-size: 11px;" />
+                <Label text="Add a topic :" prefWidth="110" style="-fx-font-size: 11px;" />
 
-                <ComboBox fx:id="comboThemes" promptText="Sélectionner un thème..."
+                <ComboBox fx:id="comboThemes" promptText="Select a topic..."
                           prefWidth="220" HBox.hgrow="ALWAYS" />
 
-                <JFXButton fx:id="btnAjouterTheme" text="+ Ajouter"
+                <JFXButton fx:id="btnAjouterTheme" text="+ Add"
                            onAction="#handleAjouterTheme"
                            style="-fx-background-color: #4CAF50; -fx-text-fill: white;"
                            prefHeight="28.0" prefWidth="90.0" />
@@ -86,7 +88,7 @@
             <!-- Les thèmes apparaîtront ici dynamiquement -->
         </FlowPane>
 
-        <Label text="ℹ️ Les thèmes permettent de classer et retrouver facilement vos exercices"
+        <Label text="ℹ️ Topics help classify and easily find your exercises"
                style="-fx-font-size: 10px; -fx-text-fill: #666666; -fx-font-style: italic;"
                wrapText="true" />
     </VBox>
@@ -95,13 +97,13 @@
 
     <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
         <Button fx:id="btnAnnuler"
-                text="Annuler"
+                text="Cancel"
                 onAction="#handleAnnuler"
                 prefWidth="120"
                 prefHeight="35"
                 style="-fx-background-color: #E0E0E0; -fx-text-fill: #333; -fx-font-size: 13px;"/>
         <Button fx:id="btnValider"
-                text="✓ Valider"
+                text="✓ Save"
                 onAction="#handleValider"
                 prefWidth="120"
                 prefHeight="35"

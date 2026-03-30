@@ -25,9 +25,8 @@
                     <Label fx:id="lblNbExercices" text="24"
                            style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #5E35B1;" />
                 </HBox>
-                <Label text="Exercices" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+                <Label text="exercises" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
             </VBox>
-
             <!-- Statistique Themes -->
             <VBox alignment="CENTER" spacing="5"
                   style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
@@ -37,7 +36,7 @@
                     <Label fx:id="lblNbThemes" text="8"
                            style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #F57C00;" />
                 </HBox>
-                <Label text="Thèmes" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
+                <Label text="Themes" style="-fx-font-size: 12px; -fx-text-fill: #666;" />
             </VBox>
 
             <!-- Statistique Questions -->
@@ -65,16 +64,16 @@
               style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 10;">
             <Label text="🔍" style="-fx-font-size: 18px;" />
             <TextField fx:id="txtRecherche"
-                       promptText="Rechercher un exercice..."
+                       promptText="Search for an exercise..."
                        prefWidth="280" maxWidth="280"
                        style="-fx-font-size: 14px; -fx-border-color: transparent; -fx-background-color: transparent;" />
-            <JFXButton text="Rechercher"
+            <JFXButton text="Search"
                        onAction="#handleRechercher"
                        style="-fx-background-color: #5E35B1; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 5 10;" />
         </HBox>
         <!-- FILTRES -->
         <VBox spacing="10">
-            <Label text="Filtrer par thèmes :"
+            <Label text="Filter by themes :"
                    style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #666;" />
             <FlowPane fx:id="flowPaneFiltres" hgap="10" vgap="10" />
         </VBox>

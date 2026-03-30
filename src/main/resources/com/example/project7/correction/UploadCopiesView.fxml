@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.project7.controller.correction.UploadCopiesController"
+            prefHeight="600" prefWidth="800"
+            style="-fx-background-color: white;">
+
+    <!-- EN-TÊTE -->
+    <top>
+        <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #5E35B1;">
+            <Label text="📄 Correction OCR - Upload des copies"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="📝 Examen :" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                <Label fx:id="lblNomExamen" text="[Nom examen]"
+                       style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label text="Questions ouvertes :" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                <Label fx:id="lblNbQuestions" text="0"
+                       style="-fx-text-fill: #FFD700; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- CENTRE : LISTE DES FICHIERS -->
+    <center>
+        <VBox spacing="15" style="-fx-padding: 20;">
+
+            <!-- Barre d'actions -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <JFXButton text="📁 Ajouter des copies (PDF/Images)"
+                           onAction="#handleAjouterFichiers"
+                           style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;"/>
+
+                <JFXButton text="📂 Ajouter un dossier"
+                           onAction="#handleAjouterDossier"
+                           style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label fx:id="lblNbFichiers" text="0 copie(s)"
+                       style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
+
+                <JFXButton text="🗑️ Tout effacer"
+                           onAction="#handleEffacerTout"
+                           style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15;"/>
+            </HBox>
+
+            <!-- Liste des fichiers -->
+            <ListView fx:id="listViewFichiers"
+                      VBox.vgrow="ALWAYS"
+                      style="-fx-border-color: #CCCCCC; -fx-border-width: 1; -fx-border-radius: 5;"/>
+
+            <!-- Info -->
+            <Label text="ℹ️ Formats acceptés : PDF, PNG, JPG, JPEG"
+                   style="-fx-font-size: 12px; -fx-text-fill: #666; -fx-font-style: italic;"/>
+        </VBox>
+    </center>
+
+    <!-- PIED : BOUTONS D'ACTION -->
+    <bottom>
+        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #F5F5F5;">
+            <JFXButton fx:id="btnLancerCorrection"
+                       text="🚀 Lancer la correction OCR"
+                       onAction="#handleLancerCorrection"
+                       disable="true"
+                       style="-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 30;"/>
+
+            <JFXButton text="Annuler"
+                       onAction="#handleAnnuler"
+                       style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 25;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -13,11 +13,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import sql_connection.SqlConnection;
-
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
-
 public class EditerTheme implements Initializable {
     // Interface pour le callback
     @FunctionalInterface
@@ -31,6 +29,7 @@ public class EditerTheme implements Initializable {
     public void setOnThemeAdded(ThemeAddedCallback callback) {
         this.onThemeAddedCallback = callback;
     }
+
     @FXML
     private TextField txtNomTheme;
 
@@ -100,10 +99,8 @@ public class EditerTheme implements Initializable {
                 }
             }
         });
-
         chargerThemes();
     }
-
     private void chargerThemes() {
         ObservableList<Theme> themes = FXCollections.observableArrayList();
         String query = "SELECT * FROM Theme ORDER BY nomTheme";
@@ -132,7 +129,7 @@ public class EditerTheme implements Initializable {
         String nomTheme = txtNomTheme.getText().trim();
 
         if (nomTheme.isEmpty()) {
-            showAlert("Erreur", "Le nom du thème ne peut pas être vide !");
+            showAlert("Erreur", "The theme name cannot be empty!");
             return;
         }
 
@@ -151,17 +148,18 @@ public class EditerTheme implements Initializable {
             stmt.setString(2, couleurHex);
             stmt.executeUpdate();
 
-            showAlert("Succès", "Thème ajouté avec succès !");
+            showAlert("Success", "Theme successfully added!");
             txtNomTheme.clear();
             colorPickerTheme.setValue(Color.web("#A53860"));
             chargerThemes();
 
         } catch (SQLException e) {
             if (e.getMessage().contains("Unique")) {
-                showAlert("Erreur", "Ce thème existe déjà !");
+                showAlert("Erreur", "This theme already exists!");
             } else {
-                showAlert("Erreur", "Impossible d'ajouter le thème : " + e.getMessage());
+                showAlert("Erreur", "Unable to add theme: " + e.getMessage());
             }
+
             e.printStackTrace();
         }
         // Appeler le callback si défini
@@ -169,12 +167,11 @@ public class EditerTheme implements Initializable {
             onThemeAddedCallback.onThemeAdded();
         }
     }
-
     private void handleSupprimerTheme(Theme theme) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
-        alert.setHeaderText("Supprimer le thème \"" + theme.getNomTheme() + "\" ?");
-        alert.setContentText("Cette action est irréversible.");
+        alert.setHeaderText("Delete theme \"" + theme.getNomTheme() + "\" ?");
+        alert.setContentText("This action is irreversible.");
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -186,7 +183,7 @@ public class EditerTheme implements Initializable {
                     stmt.setInt(1, theme.getIdTheme());
                     stmt.executeUpdate();
 
-                    showAlert("Succès", "Thème supprimé avec succès !");
+                    showAlert("Success", " !");
                     chargerThemes();
 
                 } catch (SQLException e) {
@@ -196,13 +193,11 @@ public class EditerTheme implements Initializable {
             }
         });
     }
-
     @FXML
     public void handleFermer(ActionEvent event) {
         Stage stage = (Stage) btnAjouterTheme.getScene().getWindow();
         stage.close();
     }
-
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);

@@ -94,7 +94,6 @@
                                         <Button mnemonicParsing="false" onAction="#modifyReponseHeader" text="..." prefWidth="40.0" prefHeight="30.0" />
                                     </children>
                                 </HBox>
-
                                 <!-- Ligne 4 : Number of Copies et Random Seed -->
                                 <Label prefHeight="48.0" prefWidth="193.0" text="Number of Copies :" GridPane.rowIndex="4">
                                     <font>
@@ -158,6 +157,8 @@
                             </VBox.margin>
                             <children>
                                 <JFXButton fx:id="terminer" onAction="#handleClicksSaveProject" prefHeight="39.0" prefWidth="97.0" style="-fx-background-color: #A53860;" text="Done" textFill="WHITE" />
+
+
                                 <JFXButton fx:id="cancel" onAction="#handleClicksCancelProject" prefHeight="39.0" prefWidth="91.0" style="-fx-background-color: fff0f3;" text="Cancel" />
                             </children>
                         </HBox>

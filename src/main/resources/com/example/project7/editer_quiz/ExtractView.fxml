@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.project7.controller.edition.ExtractViewController"
+            style="-fx-background-color: #f5f5f5;">
+
+    <children>
+        <BorderPane AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0">
+            
+            <top>
+                <VBox spacing="15" style="0-fx-background-color: white; -fx-padding: 25;">
+                    <Label text="📤 Extract Exercises"
+                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #c2185b;"/>
+                    <Label text="Select a project, then choose the exercises to extract to a new exam."
+                           style="-fx-font-size: 13px; -fx-text-fill: #757575; -fx-wrap-text: true;"/>
+                    <Separator/>
+                </VBox>
+            </top>
+
+            <center>
+                <HBox spacing="0" style="-fx-background-color: #f5f5f5;">
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-min-width: 350; -fx-max-width: 350;">
+                        <Label text="📁 Available Projects"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #5E35B1;"/>
+                        <TextField fx:id="txtRechercheProjet"
+                                   promptText="🔍 Search for a project…"
+                                   onKeyReleased="#handleRechercheProjet"
+                                   style="-fx-padding: 8;"/>
+                        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                            <ListView fx:id="listViewProjets"
+                                      style="-fx-background-color: transparent;"/>
+                        </ScrollPane>
+                        <Label fx:id="lblNbProjets" text="0 projet(s)"
+                               style="-fx-font-size: 11px; -fx-text-fill: #999;"/>
+                    </VBox>
+
+                    <Separator orientation="VERTICAL"/>
+
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20;" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="📚 Project Exercises"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <JFXButton fx:id="btnToutSelectionner" text="☑️ Tout sélectionner"
+                                       onAction="#handleToutSelectionner"
+                                       style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 6 12; -fx-font-size: 11px;"/>
+                            <JFXButton fx:id="btnToutDeselectionner" text="☐ Tout désélectionner"
+                                       onAction="#handleToutDeselectionner"
+                                       style="-fx-background-color: #757575; -fx-text-fill: white; -fx-padding: 6 12; -fx-font-size: 11px;"/>
+                        </HBox>
+                        <Label fx:id="lblProjetSelectionne" text="No project selected"
+                               style="-fx-font-size: 12px; -fx-text-fill: #999; -fx-font-style: italic;"/>
+                        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                            <VBox fx:id="vboxExercices" spacing="10" style="-fx-padding: 10;"/>
+                        </ScrollPane>
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10 0 0 0;">
+                            <Label fx:id="lblNbExercicesSelectionnes" text="0 exercise(s) selected"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
+            </center>
+
+            <bottom>
+                <HBox alignment="CENTER_RIGHT" spacing="15"
+                      style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #E0E0E0; -fx-border-width: 1 0 0 0;">
+                    <Label fx:id="lblStatut" text=""
+                           style="-fx-font-size: 12px; -fx-text-fill: #757575;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <JFXButton fx:id="btnExtraire" text="📤 Extract to New Exam"
+                               onAction="#handleExtraire"
+                               disable="true"
+                               style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 12 25; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </children>
+</AnchorPane>

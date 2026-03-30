@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class SqlConnection {
 
     // Use a specific folder for the database (e.g., under user home directory)
-    private static final String DB_FOLDER = Paths.get(System.getProperty("user.dir"), "database").toString();
+    private static final String DB_FOLDER = Paths.get(System.getProperty("user.home"), "database").toString();
     private static final String DB_NAME = "QuizENSEA";
     private static final String DB_PATH = DB_FOLDER + "/" + DB_NAME;
     private static final String JDBC_URL = "jdbc:h2:" + DB_PATH + ";MODE=MySQL;AUTO_SERVER=TRUE";

@@ -6,98 +6,134 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="600.0" prefWidth="794.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project7.controller.edition.EditerQuestion">
+<AnchorPane prefHeight="680.0" prefWidth="794.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project7.controller.edition.EditerQuestion">
    <children>
-      <VBox prefHeight="600.0" prefWidth="794.0">
-         <children>
-            <GridPane prefHeight="512.0" prefWidth="794.0">
-               <children>
-                  <Label text="Enter the Question :" GridPane.halignment="RIGHT">
-                     <GridPane.margin>
-                        <Insets />
-                     </GridPane.margin>
-                  </Label>
-                  <Label text="Score range :" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-                     <GridPane.margin>
-                        <Insets />
-                     </GridPane.margin>
-                  </Label>
-                  <Label text="Number of items :" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-                     <GridPane.margin>
-                        <Insets />
-                     </GridPane.margin>
-                  </Label>
-                  <Label text="Please enter the number of lines :" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-                  <Label text="Please enter the size between lines :" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-                  <Label text="Enter the Question Reminder :" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                  <Label text="( the right of the Box )&quot;" textFill="#c60e5e" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
-                     <GridPane.margin>
-                        <Insets top="40.0" />
-                     </GridPane.margin>
-                  </Label>
-                  <TextArea fx:id="enonceQuestion" prefHeight="168.0" prefWidth="325.0" promptText="Please enter the question" GridPane.columnIndex="2">
-                     <GridPane.margin>
-                        <Insets bottom="10.0" right="100.0" top="10.0" />
-                     </GridPane.margin>
-                  </TextArea>
-                  <TextField fx:id="scoringTotale" onKeyTyped="#handleInputFloat" promptText="Please enter the score range" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                     <GridPane.margin>
-                        <Insets right="100.0" />
-                     </GridPane.margin>
-                  </TextField>
-                  <TextField fx:id="nombreScore" onKeyTyped="#handleInputNumber" prefHeight="39.0" prefWidth="285.0" promptText="items" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                     <GridPane.margin>
-                        <Insets right="100.0" />
-                     </GridPane.margin>
-                  </TextField>
-                  <TextField fx:id="nombreLignes" onKeyTyped="#handleInputNumber" promptText="Number of lines" GridPane.columnIndex="2" GridPane.rowIndex="3">
-                     <GridPane.margin>
-                        <Insets right="100.0" />
-                     </GridPane.margin>
-                  </TextField>
-                  <TextField fx:id="tailleLigne" onKeyTyped="#handleInputFloat" promptText="The size between lines" GridPane.columnIndex="2" GridPane.rowIndex="4">
-                     <GridPane.margin>
-                        <Insets right="100.0" />
-                     </GridPane.margin>
-                  </TextField>
-                  <TextField fx:id="rappelQuestion" promptText="The Question Reminder" GridPane.columnIndex="2" GridPane.rowIndex="5">
-                     <GridPane.margin>
-                        <Insets right="100.0" />
-                     </GridPane.margin>
-                  </TextField>
-                  <Button mnemonicParsing="false" onAction="#modfiyQuestion" prefHeight="20.0" prefWidth="36.0" text="..." GridPane.columnIndex="2">
-                     <GridPane.margin>
-                        <Insets left="340.0" />
-                     </GridPane.margin>
-                  </Button>
-               </children>
-               <columnConstraints>
-                  <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="382.0" minWidth="10.0" prefWidth="310.0" />
-                  <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="382.0" minWidth="10.0" prefWidth="77.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="430.0" minWidth="10.0" prefWidth="425.0" />
-               </columnConstraints>
+      <ScrollPane fitToWidth="true" prefHeight="680.0" prefWidth="794.0" style="-fx-background-color: transparent;">
+         <content>
+            <VBox prefWidth="780.0" spacing="0">
                <padding>
-                  <Insets left="10.0" right="10.0" top="20.0" />
+                  <Insets bottom="50.0" />
                </padding>
-               <rowConstraints>
-                  <RowConstraints maxHeight="191.0" minHeight="10.0" prefHeight="191.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="78.0" minHeight="0.0" prefHeight="33.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               </rowConstraints>
-            </GridPane>
-            <HBox alignment="CENTER" prefHeight="68.0" prefWidth="794.0" spacing="50.0">
                <children>
-                  <JFXButton fx:id="ajouterQuestion" onAction="#ajouterQuestion" prefHeight="39.0" prefWidth="97.0" style="-fx-background-color: #A53860;" text="Add" textFill="WHITE" />
-                  <JFXButton fx:id="cancelQuestion" onAction="#cancelQuestion" prefHeight="39.0" prefWidth="91.0" style="-fx-background-color: fff0f3;" text="Cancel" />
+
+                  <!-- ========== SECTION EXERCICE (NOUVELLE) ========== -->
+                  <VBox spacing="8" style="-fx-padding: 15; -fx-border-color: #CCCCCC; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: #F5F5F5;">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                           <children>
+                              <Label text="Exercise :" prefWidth="70" style="-fx-font-size: 12px;" />
+
+                              <ComboBox fx:id="comboExercice" prefWidth="350" promptText="Sélectionner un exercice..." HBox.hgrow="ALWAYS" />
+
+                              <JFXButton fx:id="btnNouvelExercice" onAction="#handleNouvelExercice" prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #A53860;" text="+ New Exercise" textFill="WHITE" />
+
+                              <JFXButton fx:id="btnModifierExercice" onAction="#handleModifierExercice" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #FF9800;" text="Edit" textFill="WHITE" visible="false" />
+                           </children>
+                        </HBox>
+
+                        <Label text="ℹ️ Questions are grouped by exercise in the final exam." style="-fx-font-size: 11px; -fx-text-fill: #666666; -fx-font-style: italic;" wrapText="true" />
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </VBox>
+
+                  <!-- Espacement -->
+                  <Region prefHeight="10.0" />
+
+                  <!-- ========== SECTION QUESTION (EXISTANTE) ========== -->
+                  <GridPane prefHeight="512.0" prefWidth="794.0">
+                     <children>
+                        <Label text="Enter the Question :" GridPane.halignment="RIGHT">
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Score range :" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Number of items :" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Please enter the number of lines :" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                        <Label text="Please enter the size between lines :" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                        <Label text="Enter the Question Reminder :" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                        <Label text="( the right of the Box )&quot;" textFill="#c60e5e" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                           <GridPane.margin>
+                              <Insets top="40.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <TextArea fx:id="enonceQuestion" prefHeight="168.0" prefWidth="325.0" promptText="Please enter the question" GridPane.columnIndex="2">
+                           <GridPane.margin>
+                              <Insets bottom="10.0" right="100.0" top="10.0" />
+                           </GridPane.margin>
+                        </TextArea>
+                        <TextField fx:id="scoringTotale" onKeyTyped="#handleInputFloat" promptText="Please enter the score range" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets right="100.0" />
+                           </GridPane.margin>
+                        </TextField>
+                        <TextField fx:id="nombreScore" onKeyTyped="#handleInputNumber" prefHeight="39.0" prefWidth="285.0" promptText="items" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets right="100.0" />
+                           </GridPane.margin>
+                        </TextField>
+                        <TextField fx:id="nombreLignes" onKeyTyped="#handleInputNumber" promptText="Number of lines" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                           <GridPane.margin>
+                              <Insets right="100.0" />
+                           </GridPane.margin>
+                        </TextField>
+                        <TextField fx:id="tailleLigne" onKeyTyped="#handleInputFloat" promptText="The size between lines" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                           <GridPane.margin>
+                              <Insets right="100.0" />
+                           </GridPane.margin>
+                        </TextField>
+                        <TextField fx:id="rappelQuestion" promptText="The Question Reminder" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                           <GridPane.margin>
+                              <Insets right="100.0" />
+                           </GridPane.margin>
+                        </TextField>
+                        <Button mnemonicParsing="false" onAction="#modfiyQuestion" prefHeight="20.0" prefWidth="36.0" text="..." GridPane.columnIndex="2">
+                           <GridPane.margin>
+                              <Insets left="340.0" />
+                           </GridPane.margin>
+                        </Button>
+                     </children>
+                     <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="382.0" minWidth="10.0" prefWidth="310.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="382.0" minWidth="10.0" prefWidth="77.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="430.0" minWidth="10.0" prefWidth="425.0" />
+                     </columnConstraints>
+                     <padding>
+                        <Insets left="10.0" right="10.0" top="20.0" />
+                     </padding>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="191.0" minHeight="10.0" prefHeight="191.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="78.0" minHeight="0.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                  </GridPane>
+
+                  <!-- Boutons Add/Cancel -->
+                  <HBox alignment="CENTER" prefHeight="68.0" prefWidth="794.0" spacing="50.0">
+                     <children>
+                        <JFXButton fx:id="ajouterQuestion" onAction="#ajouterQuestion" prefHeight="39.0" prefWidth="97.0" style="-fx-background-color: #A53860;" text="Add" textFill="WHITE" />
+                        <JFXButton fx:id="cancelQuestion" onAction="#cancelQuestion" prefHeight="39.0" prefWidth="91.0" style="-fx-background-color: fff0f3;" text="Cancel" />
+                     </children>
+                     <padding>
+                        <Insets top="30.0" />
+                     </padding>
+                  </HBox>
                </children>
-               <padding>
-                  <Insets top="30.0" />
-               </padding>
-            </HBox>
-         </children>
-      </VBox>
+            </VBox>
+         </content>
+      </ScrollPane>
    </children>
 </AnchorPane>

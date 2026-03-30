@@ -39,7 +39,9 @@ public class Controle {
         this.typeDevoir = typeDevoir;
     }
     public void setTypeDevoir(String typeDevoir) {
-        this.typeDevoir = TypeDevoir.getTypeDevoir(typeDevoir);
+        TypeDevoir td = TypeDevoir.getTypeDevoir(typeDevoir);
+        // Si non trouvé dans l'enum → valeur par défaut
+        this.typeDevoir = (td != null) ? td : TypeDevoir.Controle_Continue;
     }
 
     public FormatQuestion getFormatQuestion() {
@@ -90,9 +92,9 @@ public class Controle {
     }
 
     public String getTypeDevoir() {
+        if (typeDevoir == null) return "Controle Continu";
         return typeDevoir.getNomDevoir();
     }
-
     public int getNombreExemplaire() {
         return nombreExemplaire;
     }

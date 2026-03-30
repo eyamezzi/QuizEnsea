@@ -11,8 +11,11 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import sql_connection.SqlConnection;
 
 import java.net.URL;
@@ -42,12 +45,12 @@ public class ThemeView implements Initializable {
         chargerStatistiques();
         afficherExercices(null);
 
-        // Ajuster après le chargement
         Platform.runLater(this::ajusterLargeurCartes);
     }
+
     private void ajusterHauteurFlowPane() {
         Platform.runLater(() -> {
-            flowPaneExercices.layout(); // Forcer le layout d'abord
+            flowPaneExercices.layout();
 
             int nbCartes = flowPaneExercices.getChildren().size();
 
@@ -56,13 +59,9 @@ public class ThemeView implements Initializable {
                 return;
             }
 
-            double viewportWidth = scrollPaneExercices.getViewportBounds().getWidth();
             int cartesParLigne = 3;
-
-            // Hauteur réelle d'une carte (mesurée)
             double hauteurCarte = 150;
 
-            // Si on a des cartes, on peut mesurer la hauteur réelle
             if (!flowPaneExercices.getChildren().isEmpty()) {
                 javafx.scene.Node premiereCarte = flowPaneExercices.getChildren().get(0);
                 if (premiereCarte.getBoundsInParent().getHeight() > 0) {
@@ -72,47 +71,38 @@ public class ThemeView implements Initializable {
 
             double vgap = flowPaneExercices.getVgap();
             double padding = flowPaneExercices.getPadding().getTop() + flowPaneExercices.getPadding().getBottom();
-
-            // Calculer le nombre de lignes nécessaires
             int nbLignes = (int) Math.ceil((double) nbCartes / cartesParLigne);
-
-            // Calculer la hauteur totale avec une marge de sécurité
             double hauteurTotale = (nbLignes * hauteurCarte) + ((nbLignes - 1) * vgap) + padding + 40;
 
             flowPaneExercices.setPrefHeight(hauteurTotale);
             flowPaneExercices.setMinHeight(hauteurTotale);
 
-            System.out.println("✅ Hauteur ajustée: " + hauteurTotale + "px | " + nbCartes + " cartes | " + nbLignes + " lignes | hauteur carte: " + hauteurCarte + "px");
+            System.out.println("✅ Hauteur ajustée: " + hauteurTotale + "px | " + nbCartes + " cartes");
         });
     }
+
     private void configurerFlowPane() {
         flowPaneExercices.setPadding(new Insets(10));
         flowPaneExercices.setHgap(16);
         flowPaneExercices.setVgap(16);
 
-        // ⭐ IMPORTANT : Forcer le recalcul de la hauteur quand les enfants changent
         flowPaneExercices.getChildren().addListener((javafx.collections.ListChangeListener<? super javafx.scene.Node>) change -> {
-            Platform.runLater(() -> {
-                ajusterHauteurFlowPane();
-            });
+            Platform.runLater(this::ajusterHauteurFlowPane);
         });
 
-        // Recalculer largeur cartes si taille viewport change
         scrollPaneExercices.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> {
             ajusterLargeurCartes();
             Platform.runLater(this::ajusterHauteurFlowPane);
         });
     }
+
     private void ajusterLargeurCartes() {
         double viewportWidth = scrollPaneExercices.getViewportBounds().getWidth();
-
         if (viewportWidth <= 0) return;
 
         int cardsPerRow = 3;
         double hgap = flowPaneExercices.getHgap();
         double padding = flowPaneExercices.getPadding().getLeft() + flowPaneExercices.getPadding().getRight();
-
-        // largeur disponible pour toutes les cartes
         double totalGapWidth = hgap * (cardsPerRow - 1);
         double availableWidth = viewportWidth - padding - totalGapWidth;
         double cardWidth = availableWidth / cardsPerRow;
@@ -127,8 +117,7 @@ public class ThemeView implements Initializable {
         });
 
         flowPaneExercices.setPrefWrapLength(viewportWidth);
-
-        System.out.println("✅ 3 CARTES PAR LIGNE | Viewport: " + viewportWidth + "px | Card: " + cardWidth + "px");
+        System.out.println("✅ Cartes ajustées | Largeur: " + cardWidth + "px");
     }
 
     public void setParentPane(AnchorPane pane) {
@@ -137,21 +126,44 @@ public class ThemeView implements Initializable {
 
     private void chargerStatistiques() {
         try (Connection conn = SqlConnection.getConnection()) {
+
+            // Compter les exercices
             PreparedStatement stmtEx = conn.prepareStatement("SELECT COUNT(*) FROM Exercice");
             ResultSet rsEx = stmtEx.executeQuery();
-            if (rsEx.next()) lblNbExercices.setText(String.valueOf(rsEx.getInt(1)));
+            if (rsEx.next()) {
+                int nbEx = rsEx.getInt(1);
+                lblNbExercices.setText(String.valueOf(nbEx));
+                System.out.println("✅ " + nbEx + " exercice(s) dans la base");
+            }
 
+            // Compter les thèmes
             PreparedStatement stmtTh = conn.prepareStatement("SELECT COUNT(*) FROM Theme");
             ResultSet rsTh = stmtTh.executeQuery();
-            if (rsTh.next()) lblNbThemes.setText(String.valueOf(rsTh.getInt(1)));
-
-            try {
-                PreparedStatement stmtQ = conn.prepareStatement("SELECT COUNT(*) FROM QCM");
-                ResultSet rsQ = stmtQ.executeQuery();
-                if (rsQ.next()) lblNbQuestions.setText(String.valueOf(rsQ.getInt(1)));
-            } catch (SQLException e) {
-                lblNbQuestions.setText("0");
+            if (rsTh.next()) {
+                int nbTh = rsTh.getInt(1);
+                lblNbThemes.setText(String.valueOf(nbTh));
+                System.out.println("✅ " + nbTh + " thème(s) dans la base");
             }
+
+            // Compter TOUTES les questions
+            int totalQuestions = 0;
+
+            try (PreparedStatement stmtQCM = conn.prepareStatement("SELECT COUNT(*) FROM QCM")) {
+                ResultSet rsQCM = stmtQCM.executeQuery();
+                if (rsQCM.next()) totalQuestions += rsQCM.getInt(1);
+            } catch (SQLException e) {
+                System.out.println("⚠️ Table QCM vide ou inexistante");
+            }
+
+            try (PreparedStatement stmtQL = conn.prepareStatement("SELECT COUNT(*) FROM QuestionLibre")) {
+                ResultSet rsQL = stmtQL.executeQuery();
+                if (rsQL.next()) totalQuestions += rsQL.getInt(1);
+            } catch (SQLException e) {
+                System.out.println("⚠️ Table QuestionLibre vide ou inexistante");
+            }
+
+            lblNbQuestions.setText(String.valueOf(totalQuestions));
+            System.out.println("✅ " + totalQuestions + " question(s) au total");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -161,29 +173,57 @@ public class ThemeView implements Initializable {
 
     @FXML
     private void handleGererThemes(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Gérer les Thèmes");
-        alert.setHeaderText("Fonctionnalité en cours de développement");
-        alert.setContentText("Vous pourrez bientôt créer, modifier et supprimer des thèmes ici.");
-        alert.showAndWait();
+        try {
+            FxmlLoader loader = new FxmlLoader();
+            Parent root = loader.getPane("editer_quiz/EditerTheme");
+
+            EditerTheme controller = (EditerTheme) loader.getController();
+            if (controller != null) {
+                controller.setOnThemeAdded(() -> {
+                    chargerThemes();
+                    chargerStatistiques();
+                    System.out.println("✅ Thèmes rechargés après ajout");
+                });
+            }
+
+            Stage stage = new Stage();
+            stage.setTitle("Gérer les Thèmes");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+            chargerThemes();
+            chargerStatistiques();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur", "Impossible d'ouvrir la gestion des thèmes : " + e.getMessage());
+        }
     }
 
     @FXML
     private void handleRechercher(ActionEvent event) {
         String recherche = txtRecherche.getText().trim().toLowerCase();
-        if (recherche.isEmpty()) afficherExercices(null);
-        else rechercherExercices(recherche);
+        if (recherche.isEmpty()) {
+            afficherExercices(null);
+        } else {
+            rechercherExercices(recherche);
+        }
     }
 
     private void rechercherExercices(String motCle) {
         flowPaneExercices.getChildren().clear();
 
+        // ✅ CORRECTION : Exercice_Theme avec underscore, exerciceID et themeID
         String query = """
-            SELECT DISTINCT e.idExercice, e.titre
+            SELECT DISTINCT e.idExercice, e.numero, e.titre, e.consigne
             FROM Exercice e
             LEFT JOIN Exercice_Theme et ON e.idExercice = et.exerciceID
             LEFT JOIN Theme t ON et.themeID = t.idTheme
-            WHERE LOWER(e.titre) LIKE ? OR LOWER(t.nomTheme) LIKE ?
+            WHERE LOWER(e.titre) LIKE ? 
+               OR LOWER(e.consigne) LIKE ?
+               OR LOWER(t.nomTheme) LIKE ?
+            ORDER BY e.numero
             """;
 
         try (Connection conn = SqlConnection.getConnection();
@@ -192,30 +232,38 @@ public class ThemeView implements Initializable {
             String pattern = "%" + motCle + "%";
             stmt.setString(1, pattern);
             stmt.setString(2, pattern);
+            stmt.setString(3, pattern);
 
             ResultSet rs = stmt.executeQuery();
             int count = 0;
 
             while (rs.next()) {
                 int id = rs.getInt("idExercice");
+                int numero = rs.getInt("numero");
                 String titre = rs.getString("titre");
+                String consigne = rs.getString("consigne");
                 List<Theme> themes = getThemesForExercice(id);
-                flowPaneExercices.getChildren().add(creerCarteExercice(id, titre, themes));
+
+                VBox carte = creerCarteExercice(id, numero, titre, consigne, themes);
+                flowPaneExercices.getChildren().add(carte);
                 count++;
             }
 
-            if (count == 0) afficherMessageVide("Aucun exercice trouvé pour : \"" + motCle + "\"");
+            if (count == 0) {
+                afficherMessageVide("No exercises found for : \"" + motCle + "\"");
+            }
 
+            System.out.println("✅ Recherche: " + count + " exercice(s) trouvé(s)");
             Platform.runLater(this::ajusterLargeurCartes);
 
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("Erreur de recherche", "Impossible de rechercher les exercices");
+            showError("Erreur de recherche", "Impossible de rechercher les exercices: " + e.getMessage());
         }
     }
 
     private void chargerThemes() {
-        String query = "SELECT idTheme, nomTheme, couleur FROM Theme";
+        String query = "SELECT idTheme, nomTheme, couleur FROM Theme ORDER BY nomTheme";
 
         try (Connection conn = SqlConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -230,11 +278,12 @@ public class ThemeView implements Initializable {
                 ));
             }
 
+            System.out.println("✅ " + allThemes.size() + " thème(s) chargé(s)");
             afficherBoutonsThemes();
 
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("Erreur de chargement", "Impossible de charger les thèmes");
+            showError("Erreur de chargement", "Impossible de charger les thèmes: " + e.getMessage());
         }
     }
 
@@ -242,8 +291,15 @@ public class ThemeView implements Initializable {
         flowPaneFiltres.getChildren().clear();
 
         // Bouton "Tous"
-        JFXButton btnTous = new JFXButton("📋 Tous");
-        btnTous.setStyle("-fx-background-color: #5E35B1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 15; -fx-cursor: hand;");
+        JFXButton btnTous = new JFXButton("📋 All");
+        btnTous.setStyle(
+                "-fx-background-color: #5E35B1; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 8 15; " +
+                        "-fx-cursor: hand;"
+        );
         btnTous.setOnAction(e -> afficherExercices(null));
         flowPaneFiltres.getChildren().add(btnTous);
 
@@ -254,7 +310,8 @@ public class ThemeView implements Initializable {
                             "-fx-text-fill: white; " +
                             "-fx-font-weight: bold; " +
                             "-fx-background-radius: 20; " +
-                            "-fx-padding: 8 15; -fx-cursor: hand;"
+                            "-fx-padding: 8 15; " +
+                            "-fx-cursor: hand;"
             );
             btn.setOnAction(e -> afficherExercices(t));
             flowPaneFiltres.getChildren().add(btn);
@@ -264,36 +321,51 @@ public class ThemeView implements Initializable {
     private void afficherExercices(Theme themeFiltre) {
         flowPaneExercices.getChildren().clear();
 
+        // ✅ CORRECTION : Exercice_Theme, exerciceID, themeID, numero
         String query = themeFiltre == null ?
-                "SELECT idExercice, titre FROM Exercice" :
-                "SELECT DISTINCT e.idExercice, e.titre FROM Exercice e JOIN Exercice_Theme et ON e.idExercice = et.exerciceID WHERE et.themeID = ?";
+                "SELECT idExercice, numero, titre, consigne FROM Exercice ORDER BY numero" :
+                """
+                SELECT DISTINCT e.idExercice, e.numero, e.titre, e.consigne 
+                FROM Exercice e 
+                JOIN Exercice_Theme et ON e.idExercice = et.exerciceID 
+                WHERE et.themeID = ?
+                ORDER BY e.numero
+                """;
 
         try (Connection conn = SqlConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            if (themeFiltre != null) stmt.setInt(1, themeFiltre.getIdTheme());
+            if (themeFiltre != null) {
+                stmt.setInt(1, themeFiltre.getIdTheme());
+            }
 
             ResultSet rs = stmt.executeQuery();
             int count = 0;
 
             while (rs.next()) {
                 int id = rs.getInt("idExercice");
+                int numero = rs.getInt("numero");
                 String titre = rs.getString("titre");
+                String consigne = rs.getString("consigne");
                 List<Theme> themes = getThemesForExercice(id);
-                flowPaneExercices.getChildren().add(creerCarteExercice(id, titre, themes));
+
+                VBox carte = creerCarteExercice(id, numero, titre, consigne, themes);
+                flowPaneExercices.getChildren().add(carte);
                 count++;
             }
 
             if (count == 0) {
                 String message = themeFiltre == null ?
-                        "Aucun exercice disponible" :
-                        "Aucun exercice pour le thème : " + themeFiltre.getNomTheme();
+                        "No exercises available. Create one from the project editor!" :
+                        "No exercises for the topic : " + themeFiltre.getNomTheme();
                 afficherMessageVide(message);
             }
 
+            System.out.println("✅ " + count + " exercice(s) affiché(s)" +
+                    (themeFiltre != null ? " pour le thème " + themeFiltre.getNomTheme() : ""));
+
             Platform.runLater(() -> {
                 ajusterLargeurCartes();
-                // Double appel avec délai pour garantir le bon calcul
                 Platform.runLater(() -> {
                     try {
                         Thread.sleep(50);
@@ -304,12 +376,14 @@ public class ThemeView implements Initializable {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("Erreur d'affichage", "Impossible d'afficher les exercices");
+            showError("Erreur d'affichage", "Impossible d'afficher les exercices: " + e.getMessage());
         }
     }
 
     private List<Theme> getThemesForExercice(int exerciceID) {
         List<Theme> themes = new ArrayList<>();
+
+        // ✅ CORRECTION : Exercice_Theme, exerciceID, themeID
         String query = """
             SELECT t.idTheme, t.nomTheme, t.couleur
             FROM Exercice_Theme et
@@ -319,6 +393,7 @@ public class ThemeView implements Initializable {
 
         try (Connection conn = SqlConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
+
             stmt.setInt(1, exerciceID);
             ResultSet rs = stmt.executeQuery();
 
@@ -331,165 +406,286 @@ public class ThemeView implements Initializable {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("⚠️ Erreur lors du chargement des thèmes pour l'exercice " + exerciceID);
         }
-
         return themes;
     }
-    private VBox creerCarteExercice(int id, String titre, List<Theme> themes) {
-        VBox card = new VBox(6);
-        card.setPadding(new Insets(10));
+
+    private VBox creerCarteExercice(int id, int numero, String titre, String consigne, List<Theme> themes) {
+        VBox card = new VBox(6); // ✅ Réduit l'espacement de 8 à 6
+        card.setPadding(new Insets(12));
         card.setPrefWidth(100);
         card.setMaxWidth(Double.MAX_VALUE);
         card.setMinWidth(100);
-
-        // ⭐ HAUTEUR FIXE pour faciliter le calcul
-        card.setMinHeight(140);
-        card.setPrefHeight(140);
-        card.setMaxHeight(140);
+        card.setMinHeight(150);
+        card.setPrefHeight(150);
+        card.setMaxHeight(150);
 
         card.setStyle(
                 "-fx-background-color: white; " +
                         "-fx-border-radius: 10; " +
                         "-fx-background-radius: 10; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 2);"
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 2); " +
+                        "-fx-cursor: hand;"
+        );
+        card.setOnMouseEntered(e -> card.setStyle(
+                card.getStyle().replace("rgba(0,0,0,0.15)", "rgba(0,0,0,0.25)")
+        ));
+        card.setOnMouseExited(e -> card.setStyle(
+                card.getStyle().replace("rgba(0,0,0,0.25)", "rgba(0,0,0,0.15)")
+        ));
+        // En-tête
+        HBox header = new HBox(5);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label lblNumero = new Label("Ex. " + numero);
+        lblNumero.setStyle(
+                "-fx-background-color: #E3F2FD; " +
+                        "-fx-text-fill: #1976D2; " +
+                        "-fx-padding: 3 8; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-font-size: 10px; " +
+                        "-fx-font-weight: bold;"
         );
 
-        Label lblTitre = new Label(titre != null ? titre : "Sans titre");
-        lblTitre.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #5E35B1;");
+        Label lblType = new Label("QCM");
+        lblType.setStyle(
+                "-fx-background-color: #F3E5F5; " +
+                        "-fx-text-fill: #7B1FA2; " +
+                        "-fx-padding: 3 8; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-font-size: 10px; " +
+                        "-fx-font-weight: bold;"
+        );
+        header.getChildren().addAll(lblNumero, lblType);
+
+        // Titre
+        String titreFinal = (titre != null && !titre.trim().isEmpty()) ? titre : "Sans titre";
+        Label lblTitre = new Label(titreFinal);
+        lblTitre.setStyle(
+                "-fx-font-size: 13px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: #5E35B1;"
+        );
         lblTitre.setWrapText(true);
         lblTitre.setMaxWidth(Double.MAX_VALUE);
-        lblTitre.setMinHeight(25);
-        lblTitre.setMaxHeight(40);
+        lblTitre.setMaxHeight(32); // ✅ Réduit de 35 à 32
 
-        Label lblType = new Label("QCM");
-        lblType.setStyle("-fx-font-size: 9px; -fx-text-fill: #999; -fx-font-style: italic;");
+        // Consigne
+        String consigneText = "Pas de consigne";
+        if (consigne != null && !consigne.trim().isEmpty()) {
+            consigneText = consigne.length() > 55 ? // ✅ Réduit de 60 à 55 caractères
+                    consigne.substring(0, 55) + "..." : consigne;
+        }
 
-        FlowPane paneThemes = new FlowPane(3,3);
+        Label lblConsigne = new Label(consigneText);
+        lblConsigne.setStyle(
+                "-fx-font-size: 10px; " +
+                        "-fx-text-fill: #757575; " +
+                        "-fx-font-style: italic;"
+        );
+        lblConsigne.setWrapText(true);
+        lblConsigne.setMaxHeight(26); // ✅ Réduit de 30 à 26
+
+        // Tags thèmes
+        FlowPane paneThemes = new FlowPane(4, 4);
         paneThemes.setMaxWidth(Double.MAX_VALUE);
-        paneThemes.setPrefHeight(30);
-        paneThemes.setMaxHeight(30);
+        paneThemes.setPrefHeight(22); // ✅ Réduit de 25 à 22
+        paneThemes.setMaxHeight(22);
 
         if (themes.isEmpty()) {
             Label lblAucun = new Label("Aucun thème");
-            lblAucun.setStyle("-fx-background-color: #CCCCCC; -fx-text-fill: white; -fx-padding: 2 6; -fx-background-radius: 8; -fx-font-size: 9px;");
+            lblAucun.setStyle(
+                    "-fx-background-color: #BDBDBD; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-padding: 2 6; " +
+                            "-fx-background-radius: 8; " +
+                            "-fx-font-size: 9px;"
+            );
             paneThemes.getChildren().add(lblAucun);
         } else {
-            int maxTags = Math.min(themes.size(), 3);
-            for (int i=0;i<maxTags;i++){
+            int maxTags = Math.min(themes.size(), 2);
+            for (int i = 0; i < maxTags; i++) {
                 Theme t = themes.get(i);
                 Label tag = new Label(t.getNomTheme());
-                tag.setStyle("-fx-background-color: " + t.getCouleur() + "; -fx-text-fill: white; -fx-padding: 2 6; -fx-background-radius: 8; -fx-font-size: 9px;");
+                tag.setStyle(
+                        "-fx-background-color: " + t.getCouleur() + "; " +
+                                "-fx-text-fill: white; " +
+                                "-fx-padding: 2 6; " +
+                                "-fx-background-radius: 8; " +
+                                "-fx-font-size: 9px;"
+                );
                 paneThemes.getChildren().add(tag);
             }
-            if (themes.size() > 3){
-                Label plusTag = new Label("+" + (themes.size()-3));
-                plusTag.setStyle("-fx-background-color: #999; -fx-text-fill: white; -fx-padding: 2 6; -fx-background-radius: 8; -fx-font-size: 9px;");
+
+            if (themes.size() > 2) {
+                Label plusTag = new Label("+" + (themes.size() - 2));
+                plusTag.setStyle(
+                        "-fx-background-color: #9E9E9E; " +
+                                "-fx-text-fill: white; " +
+                                "-fx-padding: 2 6; " +
+                                "-fx-background-radius: 8; " +
+                                "-fx-font-size: 9px;"
+                );
                 paneThemes.getChildren().add(plusTag);
             }
         }
 
+        // ✅ Spacer plus petit pour remonter le bouton
         Region spacer = new Region();
-        VBox.setVgrow(spacer, Priority.ALWAYS);
+        spacer.setPrefHeight(5); // Limite la hauteur du spacer
+        VBox.setVgrow(spacer, Priority.SOMETIMES); // Change de ALWAYS à SOMETIMES
 
-        JFXButton btnEditer = creerBoutonEditerCompact(id);
-        btnEditer.setMinHeight(25);
-        btnEditer.setPrefHeight(25);
+        // Bouton éditer
+        JFXButton btnEditer = new JFXButton("✏️ Éditer");
+        btnEditer.setStyle(
+                "-fx-background-color: #2196F3; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 11px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-padding: 5 12; " + // ✅ Réduit padding de 6 14 à 5 12
+                        "-fx-cursor: hand;"
+        );
+        btnEditer.setOnAction(e -> editerExercice(id));
+        btnEditer.setOnMouseEntered(e -> btnEditer.setStyle(
+                btnEditer.getStyle().replace("#2196F3", "#1976D2")
+        ));
+        btnEditer.setOnMouseExited(e -> btnEditer.setStyle(
+                btnEditer.getStyle().replace("#1976D2", "#2196F3")
+        ));
 
         HBox btnContainer = new HBox(btnEditer);
         btnContainer.setAlignment(Pos.CENTER_RIGHT);
-        btnContainer.setPadding(new Insets(3,0,0,0));
+        btnContainer.setPadding(new Insets(0)); // ✅ Supprime le padding
 
-        card.getChildren().addAll(lblTitre, lblType, paneThemes, spacer, btnContainer);
+        card.getChildren().addAll(
+                header,
+                lblTitre,
+                lblConsigne,
+                paneThemes,
+                spacer,
+                btnContainer
+        );
 
         return card;
-    }
-
-    private JFXButton creerBoutonEditerCompact(int exerciceID) {
-        JFXButton btn = new JFXButton("✏️ Éditer");
-        String styleBase = "-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 15; -fx-padding: 6 14; -fx-cursor: hand;";
-        String styleHover = styleBase.replace("#2196F3","#1976D2");
-        btn.setStyle(styleBase);
-        btn.setOnAction(e -> editerExercice(exerciceID));
-        btn.setOnMouseEntered(e -> btn.setStyle(styleHover));
-        btn.setOnMouseExited(e -> btn.setStyle(styleBase));
-        return btn;
     }
 
     private void afficherMessageVide(String message) {
         VBox empty = new VBox(15);
         empty.setAlignment(Pos.CENTER);
         empty.setPadding(new Insets(40));
-        empty.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5,0,0,2);");
+        empty.setPrefWidth(flowPaneExercices.getPrefWidth() - 40);
+        empty.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
+        );
 
         Label icon = new Label("📭");
         icon.setStyle("-fx-font-size: 48px;");
 
         Label msg = new Label(message);
-        msg.setStyle("-fx-font-size: 14px; -fx-text-fill: #999; -fx-wrap-text: true;");
+        msg.setStyle(
+                "-fx-font-size: 14px; " +
+                        "-fx-text-fill: #999; " +
+                        "-fx-wrap-text: true; " +
+                        "-fx-text-alignment: center;"
+        );
 
-        empty.getChildren().addAll(icon,msg);
+        empty.getChildren().addAll(icon, msg);
         flowPaneExercices.getChildren().add(empty);
     }
 
-    private void editerExercice(int exerciceID){
+    private void editerExercice(int exerciceID) {
         try {
             int controleID = getControleIDFromExercice(exerciceID);
-            if (controleID == -1){ showError("Erreur","Contrôle introuvable."); return; }
+            if (controleID == -1) {
+                showError("Erreur", "Contrôle introuvable pour cet exercice.");
+                return;
+            }
 
             int projetID = getProjetIDFromControle(controleID);
-            if (projetID == -1){ showError("Erreur","Projet introuvable."); return; }
+            if (projetID == -1) {
+                showError("Erreur", "Projet introuvable pour ce contrôle.");
+                return;
+            }
 
             Projet projet = loadProjet(projetID);
-            if (projet==null){ showError("Erreur","Impossible de charger le projet."); return; }
+            if (projet == null) {
+                showError("Erreur", "Impossible de charger le projet.");
+                return;
+            }
 
             FxmlLoader loader = new FxmlLoader();
             Parent view = loader.getPane("editer_quiz/_2_EditerProjet");
 
             EditerProjet controller = (EditerProjet) loader.getController();
-            if(controller!=null){
+            if (controller != null) {
                 controller.setParentPane(parentPane);
                 controller.setProjet(projet);
             }
 
             parentPane.getChildren().setAll(view);
+            System.out.println("✅ Navigation vers l'édition du projet " + projetID);
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            showError("Erreur","Impossible d'ouvrir l'éditeur : "+e.getMessage());
+            showError("Erreur", "Impossible d'ouvrir l'éditeur : " + e.getMessage());
         }
     }
 
-    private int getControleIDFromExercice(int exerciceID){
-        try(Connection conn = SqlConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT controleID FROM Exercice WHERE idExercice=?")){
-            stmt.setInt(1,exerciceID);
+    private int getControleIDFromExercice(int exerciceID) {
+        try (Connection conn = SqlConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT controleID FROM Exercice WHERE idExercice = ?"
+             )) {
+            stmt.setInt(1, exerciceID);
             ResultSet rs = stmt.executeQuery();
-            return rs.next()?rs.getInt("controleID"):-1;
-        } catch (SQLException e){ e.printStackTrace(); return -1; }
+            return rs.next() ? rs.getInt("controleID") : -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
-    private int getProjetIDFromControle(int controleID){
-        try(Connection conn = SqlConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT projetID FROM Controle WHERE idControle=?")){
-            stmt.setInt(1,controleID);
+    private int getProjetIDFromControle(int controleID) {
+        try (Connection conn = SqlConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT projetID FROM Controle WHERE idControle = ?"
+             )) {
+            stmt.setInt(1, controleID);
             ResultSet rs = stmt.executeQuery();
-            return rs.next()?rs.getInt("projetID"):-1;
-        } catch (SQLException e){ e.printStackTrace(); return -1; }
+            return rs.next() ? rs.getInt("projetID") : -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
-    private Projet loadProjet(int projetID){
-        try(Connection conn = SqlConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Projet WHERE idProjet=?")){
-            stmt.setInt(1,projetID);
+    private Projet loadProjet(int projetID) {
+        try (Connection conn = SqlConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT * FROM Projet WHERE idProjet = ?"
+             )) {
+            stmt.setInt(1, projetID);
             ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                return new Projet(projetID, rs.getString("nomProjet"), rs.getString("localisationProjet"), rs.getString("typeProjet"), rs.getDate("creationDate"));
+            if (rs.next()) {
+                return new Projet(
+                        projetID,
+                        rs.getString("nomProjet"),
+                        rs.getString("localisationProjet"),
+                        rs.getString("typeProjet"),
+                        rs.getDate("creationDate")
+                );
             }
-        } catch (SQLException e){ e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
-    private void showError(String title,String message){
+    private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);

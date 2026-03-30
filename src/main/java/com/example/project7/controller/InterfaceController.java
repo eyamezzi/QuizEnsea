@@ -1,6 +1,7 @@
 package com.example.project7.controller;
 
 import com.example.project7.FxmlLoader;
+import com.example.project7.controller.edition.ExtractViewController;
 import com.example.project7.controller.edition.OpenProjet;
 import com.example.project7.controller.edition.SelectionTypeProjet;
 import com.example.project7.controller.edition.ThemeView;
@@ -35,7 +36,30 @@ public class InterfaceController implements Initializable {
         anchorpane3.getChildren().removeAll();
         anchorpane3.getChildren().setAll(view);
     }
+    @FXML
+    private void handleClicksExtract(ActionEvent event) {
+        try {
+            FxmlLoader loader = new FxmlLoader();
+            Parent view = loader.getPane("editer_quiz/ExtractView");
 
+            ExtractViewController controller = (ExtractViewController) loader.getController();
+            if (controller != null) {
+                controller.setParentPane(anchorpane3); // ✅ Passer le parentPane
+            }
+
+            anchorpane3.getChildren().clear();
+            anchorpane3.getChildren().add(view);
+
+            AnchorPane.setTopAnchor(view, 0.0);
+            AnchorPane.setBottomAnchor(view, 0.0);
+            AnchorPane.setLeftAnchor(view, 0.0);
+            AnchorPane.setRightAnchor(view, 0.0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+    }
     @FXML
     void handleClicksNew(ActionEvent event) {
         FxmlLoader object = new FxmlLoader();

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import com.jfoenix.controls.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.project7.controller.correction.CorrectionOCRController"
+            prefHeight="700" prefWidth="1200"
+            style="-fx-background-color: #F5F5F5;">
+
+    <!-- EN-TÊTE -->
+    <top>
+        <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #5E35B1;">
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="📄 Correction OCR"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label text="Copie :" style="-fx-text-fill: white;"/>
+                <Label fx:id="lblProgress" text="1 / 10"
+                       style="-fx-text-fill: #FFD700; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+            </HBox>
+
+            <ProgressBar fx:id="progressBar" prefWidth="1000" progress="0.1"
+                         style="-fx-accent: #FFD700;"/>
+        </VBox>
+    </top>
+
+    <!-- CENTRE : SPLITPANE -->
+    <center>
+        <SplitPane dividerPositions="0.5">
+
+            <!-- GAUCHE : IMAGE SCANNÉE -->
+            <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white;">
+                <Label text="📄 Copie scannée"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS"
+                            style="-fx-background-color: #FAFAFA;">
+                    <ImageView fx:id="imageReponse" preserveRatio="true"
+                               style="-fx-cursor: hand;"/>
+                </ScrollPane>
+
+                <HBox spacing="10" alignment="CENTER">
+                    <JFXButton text="🔍 Zoom +" onAction="#handleZoomIn"
+                               style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                    <JFXButton text="🔍 Zoom -" onAction="#handleZoomOut"
+                               style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                    <JFXButton text="↻ Pivoter" onAction="#handleRotate"
+                               style="-fx-background-color: #FF9800; -fx-text-fill: white;"/>
+                </HBox>
+            </VBox>
+
+            <!-- DROITE : ANALYSE OCR -->
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: white;">
+
+                <!-- Question -->
+                <VBox spacing="5">
+                    <Label text="❓ Question"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label fx:id="lblQuestion" wrapText="true"
+                           style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #F5F5F5; -fx-background-radius: 5;"/>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Texte OCR -->
+                <VBox spacing="5" VBox.vgrow="ALWAYS">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="📝 Texte extrait par OCR"
+                               style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                        <Region HBox.hgrow="ALWAYS"/>
+
+                        <JFXButton text="🔄 Relancer OCR"
+                                   onAction="#handleRelancerOCR"
+                                   style="-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-font-size: 11px;"/>
+
+                        <Label text="Confiance:"/>
+                        <Label fx:id="lblConfiance" text="85%"
+                               style="-fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                    </HBox>
+
+                    <TextArea fx:id="txtTexteOCR" wrapText="true"
+                              VBox.vgrow="ALWAYS"
+                              style="-fx-font-size: 13px; -fx-font-family: 'Consolas', monospace;"/>
+
+                    <Label text="ℹ️ Vous pouvez corriger le texte si l'OCR a fait des erreurs"
+                           style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic;"/>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Note -->
+                <HBox spacing="20" alignment="CENTER_LEFT">
+                    <VBox spacing="5" alignment="CENTER">
+                        <Label text="📊 Note maximale"/>
+                        <Label fx:id="lblNoteMax" text="4.0"
+                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #666;"/>
+                    </VBox>
+
+                    <Separator orientation="VERTICAL"/>
+
+                    <VBox spacing="5" alignment="CENTER">
+                        <Label text="🤖 Note suggérée (OCR)"/>
+                        <Label fx:id="lblNoteSuggeree" text="2.5"
+                               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
+                    </VBox>
+
+                    <Label text="→" style="-fx-font-size: 24px;"/>
+
+                    <VBox spacing="5" alignment="CENTER">
+                        <Label text="✏️ Note finale" style="-fx-font-weight: bold;"/>
+                        <Spinner fx:id="spinnerNoteFinale"
+                                 editable="true"
+                                 prefWidth="100"
+                                 style="-fx-font-size: 18px;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Commentaire -->
+                <VBox spacing="5">
+                    <Label text="💬 Commentaire (optionnel)"
+                           style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    <TextArea fx:id="txtCommentaire"
+                              promptText="Ajouter un commentaire pour l'étudiant..."
+                              prefHeight="60"
+                              style="-fx-font-size: 12px;"/>
+                </VBox>
+
+                <!-- Boutons d'action -->
+                <HBox spacing="15" alignment="CENTER_RIGHT">
+                    <JFXButton text="⏭ Passer sans noter"
+                               onAction="#handlePasser"
+                               style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-padding: 8 20;"/>
+
+                    <JFXButton text="✓ Valider et suivant"
+                               onAction="#handleValider"
+                               style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30;"/>
+                </HBox>
+            </VBox>
+
+        </SplitPane>
+    </center>
+
+</BorderPane>

@@ -1,6 +1,6 @@
 package com.example.project7.model;
 
-public class RowTableSection {
+public class RowTableSection extends TableRow {
     private String idSection;
     private String type;
     private String question;
@@ -11,6 +11,7 @@ public class RowTableSection {
     private Integer exerciceNumero;
     private String exerciceTitre;
     public RowTableSection(String idSection, String type, String question, int ordre) {
+        super();
         this.idSection = idSection;
         this.type = type;
         this.question = question;
@@ -18,12 +19,14 @@ public class RowTableSection {
     }
 
     public RowTableSection(String chemin, String legend, int ordre) {
+        super();
         this.chemin = chemin;
         this.legend = legend;
         this.ordre = ordre;
     }
 
     public RowTableSection(String chemin, String legend, int ordre, double width) {
+        super();
         this.chemin = chemin;
         this.legend = legend;
         this.ordre = ordre;
