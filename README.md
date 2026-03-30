@@ -36,7 +36,7 @@ To get a local copy up and running, follow these simple steps:
 git clone https://github.com/HadjSassi/QuizEnsea.git
 cd QuizEnsea
 ```
-- Or if you want the executable only, just download this [file](https://www.hadjsassi.tunissportsuniversity.tn/portfolio/ENSEA_AMC%20installer.exe) and proceed with the simple steps.
+
 
 ## Usage
 To start the application:
